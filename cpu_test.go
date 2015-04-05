@@ -2,40 +2,31 @@ package main
 
 import "testing"
 
-func TestC(t *testing.T) {
+func testStatus(t *testing.T, flag byte) {
   cpu := CPUNew()
-  if (cpu.C()) {
+  if (cpu.Status(flag)) {
     t.Fail()
   }
 
-  cpu.SetC(true)
+  cpu.SetStatus(flag, true)
 
-  if (!cpu.C()) {
+  if (!cpu.Status(flag)) {
     t.Fail()
   }
 
-  cpu.SetC(false)
+  cpu.SetStatus(flag, false)
 
-  if (cpu.C()) {
+  if (cpu.Status(flag)) {
     t.Fail()
   }
 }
 
-func TestZ(t *testing.T) {
-  cpu := CPUNew()
-  if (cpu.Z()) {
-    t.Fail()
-  }
-
-  cpu.SetZ(true)
-
-  if (!cpu.Z()) {
-    t.Fail()
-  }
-
-  cpu.SetZ(false)
-
-  if (cpu.Z()) {
-    t.Fail()
-  }
+func TestStatus(t *testing.T) {
+  testStatus(t, C)
+  testStatus(t, Z)
+  testStatus(t, I)
+  testStatus(t, D)
+  testStatus(t, B)
+  testStatus(t, V)
+  testStatus(t, N)
 }
