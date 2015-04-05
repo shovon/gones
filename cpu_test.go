@@ -8,13 +8,13 @@ func TestC(t *testing.T) {
     t.Fail()
   }
 
-  cpu.setC(true)
+  cpu.SetC(true)
 
   if (!cpu.C()) {
     t.Fail()
   }
 
-  cpu.setC(false)
+  cpu.SetC(false)
 
   if (cpu.C()) {
     t.Fail()
@@ -27,13 +27,13 @@ func TestZ(t *testing.T) {
     t.Fail()
   }
 
-  cpu.setZ(true)
+  cpu.SetZ(true)
 
   if (!cpu.Z()) {
     t.Fail()
   }
 
-  cpu.setZ(false)
+  cpu.SetZ(false)
 
   if (cpu.Z()) {
     t.Fail()

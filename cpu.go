@@ -21,11 +21,15 @@ func CPUNew() CPU {
   return CPU{ A:0, X:0, Y:0, P: 0 }
 }
 
-func (c* CPU) C() bool {
-  return (c.P & C) != 0
+func (c* CPU) status(flag byte) bool {
+  return (c.P & flag) != 0
 }
 
-func (c* CPU) setC(status bool) {
+func (c* CPU) C() bool {
+  return c.status(C)
+}
+
+func (c* CPU) SetC(status bool) {
   if status {
     c.P = c.P | C
   } else {
@@ -34,10 +38,10 @@ func (c* CPU) setC(status bool) {
 }
 
 func (c* CPU) Z() bool {
-  return (c.P & Z) != 0
+  return c.status(Z)
 }
 
-func (c* CPU) setZ(status bool) {
+func (c* CPU) SetZ(status bool) {
   if status {
     c.P = c.P | Z
   } else {
