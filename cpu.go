@@ -32,3 +32,15 @@ func (c* CPU) setC(status bool) {
     c.P = c.P & ^C
   }
 }
+
+func (c* CPU) Z() bool {
+  return (c.P & Z) != 0
+}
+
+func (c* CPU) setZ(status bool) {
+  if status {
+    c.P = c.P | Z
+  } else {
+    c.P = c.P & ^Z
+  }
+}

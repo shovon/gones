@@ -20,3 +20,22 @@ func TestC(t *testing.T) {
     t.Fail()
   }
 }
+
+func TestZ(t *testing.T) {
+  cpu := CPUNew()
+  if (cpu.Z()) {
+    t.Fail()
+  }
+
+  cpu.setZ(true)
+
+  if (!cpu.Z()) {
+    t.Fail()
+  }
+
+  cpu.setZ(false)
+
+  if (cpu.Z()) {
+    t.Fail()
+  }
+}
