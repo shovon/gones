@@ -24,3 +24,11 @@ func CPUNew() CPU {
 func (c* CPU) C() bool {
   return (c.P & C) != 0
 }
+
+func (c* CPU) setC(status bool) {
+  if status {
+    c.P = c.P | C
+  } else {
+    c.P = c.P & ^C
+  }
+}
