@@ -25,17 +25,16 @@ func (c* CPU) status(flag byte) bool {
   return (c.P & flag) != 0
 }
 
-func (c* CPU) C() bool {
-  return c.status(C)
-}
-
-func (c* CPU) SetC(status bool) {
+func (c* CPU) setStatus(flag byte, status bool) {
   if status {
-    c.P = c.P | C
+    c.P = c.P | flag
   } else {
-    c.P = c.P & ^C
+    c.P = c.P & ^flag
   }
 }
+
+func (c* CPU) C() bool { return c.status(C) }
+func (c* CPU) SetC(status bool) { c.setStatus(C, status) }
 
 func (c* CPU) Z() bool {
   return c.status(Z)
