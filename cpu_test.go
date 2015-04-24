@@ -4,19 +4,19 @@ import "testing"
 
 func testStatus(t *testing.T, flag byte) {
   cpu := CPUNew()
-  if (cpu.Status(flag)) {
+  if (cpu.status(flag)) {
     t.Fail()
   }
 
-  cpu.SetStatus(flag, true)
+  cpu.setStatus(flag, true)
 
-  if (!cpu.Status(flag)) {
+  if (!cpu.status(flag)) {
     t.Fail()
   }
 
-  cpu.SetStatus(flag, false)
+  cpu.setStatus(flag, false)
 
-  if (cpu.Status(flag)) {
+  if (cpu.status(flag)) {
     t.Fail()
   }
 }
@@ -29,4 +29,8 @@ func TestStatus(t *testing.T) {
   testStatus(t, B)
   testStatus(t, V)
   testStatus(t, N)
+}
+
+func TestAdc(t *testing.T) {
+
 }
