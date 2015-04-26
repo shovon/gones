@@ -72,6 +72,7 @@ func TestAdc(t *testing.T) {
 func TestLda(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     0xA9, 3,
+    0xA9, 128,
   })
   cpu := CPUNew()
   cpu.SetInstructions(instructions)
@@ -80,11 +81,35 @@ func TestLda(t *testing.T) {
     log.Printf("Expecting program counter to point to location 0x8000, but it's pointing at %d", cpu.pc)
     t.Fail()
   }
+
   cpu.RunNextInstruction()
+  if cpu.cycles != 2 {
+    log.Printf("LDA immediate should have expanded two clock cycles")
+    t.Fail()
+  }
+  if cpu.N() {
+    log.Printf("The number in accumulator is not signed as negative, but the N flag has been set to true")
+    t.Fail()
+  }
+  if cpu.Z() {
+    log.Printf("The number in accumulator is not zero, but the Z flag has been set to true")
+    t.Fail()
+  }
   if cpu.A() != 3 {
     log.Printf("Expecting 3, but got %d", cpu.A)
     t.Fail()
   }
+  cpu.cycles = 0
+
+  cpu.RunNextInstruction()
+  if cpu.cycles != 2 { t.Fail() }
+  if !cpu.N() {
+    log.Printf("The number in accumulator is signed as negative, but the N flag is set to false")
+    t.Fail()
+  }
+  if cpu.Z() { t.Fail() }
+  if cpu.A() != 128 { t.Fail() }
+  cpu.cycles = 0
 }
 
 func TestSta(t *testing.T) {

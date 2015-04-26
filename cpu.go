@@ -216,10 +216,15 @@ func (c* CPU) adc(value byte) {
 
 // LoaD Accumulator
 func (c* CPU) lda(value byte) {
-  if (value == 0) {
+  if value == 0 {
     c.SetZ(true)
   } else {
     c.SetZ(false)
+  }
+  if value & 0x80 != 0 {
+    c.SetN(true)
+  } else {
+    c.SetN(false)
   }
   c.a = value
 }
