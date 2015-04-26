@@ -73,6 +73,7 @@ func TestLda(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     0xA9, 3,
     0xA9, 128,
+    0xA9, 0,
   })
   cpu := CPUNew()
   cpu.SetInstructions(instructions)
@@ -109,6 +110,13 @@ func TestLda(t *testing.T) {
   }
   if cpu.Z() { t.Fail() }
   if cpu.A() != 128 { t.Fail() }
+  cpu.cycles = 0
+
+  cpu.RunNextInstruction()
+  if cpu.cycles != 2 { t.Fail() }
+  if cpu.N() { t.Fail() }
+  if !cpu.Z() { t.Fail() }
+  if cpu.A() != 0 { t.Fail() }
   cpu.cycles = 0
 }
 
