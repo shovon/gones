@@ -233,6 +233,10 @@ func (c* CPU) lda(value byte) {
   c.a = value
 }
 
+func (c *CPU) nop() {
+  c.cycles++
+}
+
 func (c* CPU) sta(address uint16) {
   c.memory.SetUint8At(address, c.a)
 }
@@ -261,7 +265,7 @@ func (c* CPU) RunNextInstruction() error {
   case 0xA1: c.lda(c.getFromIndirectIndexed())
   case 0xB1: c.lda(c.getFromIndexedIndirect())
 
-  case 0xEA:
+  case 0xEA: c.nop()
 
   // STA (STore Accumulator)
   case 0x85: c.sta(c.getZeroPageAddress())
@@ -271,6 +275,8 @@ func (c* CPU) RunNextInstruction() error {
   case 0x99: c.sta(c.getAbsoluteYAddress(false))
   case 0x81: c.sta(c.getIndexedIndirectAddress())
   case 0x90: c.sta(c.getIndirectIndexedAddress(false))
+
+  // case 0x86: c.sta()
   }
 
   return nil

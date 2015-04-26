@@ -145,6 +145,22 @@ func TestLda(t *testing.T) {
   cpu.cycles = 0
 }
 
+func TestNop(t *testing.T) {
+  instructions := ConvertSimpleInstructions([]byte{
+    0xEA,
+  })
+  cpu := CPUNew()
+  cpu.SetInstructions(instructions)
+  cpu.MovePCToResetVector()
+
+  cpu.RunNextInstruction();
+  if cpu.cycles != 2 {
+    log.Printf("Expecting 2 CPU cycles, but got %d", cpu.cycles)
+    t.Fail()
+  }
+  cpu.cycles = 0
+}
+
 func TestSta(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     0xA9, 42,
@@ -161,4 +177,8 @@ func TestSta(t *testing.T) {
   if cpu.P() != previousP { t.Fail() }
   if cpu.memory.GetUint8At(0x24) != 42 { t.Fail() }
   cpu.cycles = 0
+}
+
+func TestStx(t *testing.T) {
+
 }
