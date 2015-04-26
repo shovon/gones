@@ -59,7 +59,11 @@ func (c* CPU) setStatus(flag byte, status bool) {
   }
 }
 
+// Gets the current content of the A register.
 func (c* CPU) A() byte { return c.a }
+
+// Gets the current content of the P register.
+func (c* CPU) P() byte { return c.p }
 
 // Gets the current value of the C flag
 func (c* CPU) C() bool { return c.status(C) }

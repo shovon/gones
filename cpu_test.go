@@ -65,15 +65,9 @@ func TestSetInstructions(t *testing.T) {
   }
 }
 
-func TestAdc(t *testing.T) {
-  
-}
-
-func TestLda(t *testing.T) {
+func TestMovePCToResetVector(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
-    0xA9, 3,
-    0xA9, 128,
-    0xA9, 0,
+    0xEA,
   })
   cpu := CPUNew()
   cpu.SetInstructions(instructions)
@@ -82,6 +76,28 @@ func TestLda(t *testing.T) {
     log.Printf("Expecting program counter to point to location 0x8000, but it's pointing at %d", cpu.pc)
     t.Fail()
   }
+}
+
+func TestAdc(t *testing.T) {
+  
+}
+
+func TestLda(t *testing.T) {
+  instructions := ConvertSimpleInstructions([]byte{
+    // Immediate
+    0xA9, 3,
+    0xA9, 128,
+    0xA9, 0,
+
+    // Zero Page
+    0xA9, 42,
+    0x85, 0x24,
+    0xA9, 0,
+    0xA5, 0x24,
+  })
+  cpu := CPUNew()
+  cpu.SetInstructions(instructions)
+  cpu.MovePCToResetVector()
 
   cpu.RunNextInstruction()
   if cpu.cycles != 2 {
@@ -118,8 +134,31 @@ func TestLda(t *testing.T) {
   if !cpu.Z() { t.Fail() }
   if cpu.A() != 0 { t.Fail() }
   cpu.cycles = 0
+
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  cpu.RunNextInstruction();
+  if cpu.A() != 0 { t.Fail() } // Reset to test another operation, below
+  cpu.cycles = 0
+  cpu.RunNextInstruction()
+  if cpu.A() != 42 { t.Fail() }
+  cpu.cycles = 0
 }
 
 func TestSta(t *testing.T) {
-
+  instructions := ConvertSimpleInstructions([]byte{
+    0xA9, 42,
+    0x85, 0x24,
+  })
+  cpu := CPUNew()
+  cpu.SetInstructions(instructions)
+  cpu.MovePCToResetVector()
+  
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  previousP := cpu.P()
+  cpu.RunNextInstruction()
+  if cpu.cycles != 3 { t.Fail() }
+  if cpu.P() != previousP { t.Fail() }
+  if cpu.memory.GetUint8At(0x24) != 42 { t.Fail() }
+  cpu.cycles = 0
 }
