@@ -2,6 +2,7 @@ package main
 
 const MEMORY_SIZE uint16 = 1024*64 - 1
 
+// Represents the NES RAM.
 type Memory [MEMORY_SIZE]byte
 
 // Gets two contiguous bytes at the specified memory location, interpreting them
@@ -10,7 +11,7 @@ func (m *Memory) GetUint16LEAt(location uint16) uint16 {
   return (uint16(m[location+1]) << 8) | uint16(m[location])
 }
 
-// Utility function to grab a 16-bit value
+// Utility function to grab a 16-bit value, interpreting it as little-endian.
 func GetUint16LEAt(buffer []byte, location uint16) uint16 {
   lsb := buffer[location]
   msb := buffer[location+1]

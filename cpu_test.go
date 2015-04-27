@@ -32,6 +32,14 @@ func TestStatus(t *testing.T) {
   testStatus(t, N)
 }
 
+func initCPUWithBasicInstructions(instructions []byte) *CPU {
+  newInstructions := ConvertSimpleInstructions(instructions)
+  cpu := CPUNew()
+  cpu.SetInstructions(newInstructions)
+  cpu.MovePCToResetVector()
+  return cpu
+}
+
 func TestConvertSimpleInstructions(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     0xEA,
@@ -90,9 +98,11 @@ func TestLda(t *testing.T) {
     0xA9, 0,
 
     // Zero Page
+    // Set-up
     0xA9, 42,
     0x85, 0x24,
     0xA9, 0,
+    // Instruction under test.
     0xA5, 0x24,
   })
   cpu := CPUNew()
@@ -145,6 +155,40 @@ func TestLda(t *testing.T) {
   cpu.cycles = 0
 }
 
+func TestLdx(t *testing.T) {
+  instructions := ConvertSimpleInstructions([]byte{
+    // Immediate
+    0xA2, 3,
+    0xA2, 128,
+    0xA2, 0,
+
+    // Zero Page
+    // Set-up
+    0xA9, 42,
+  })
+  cpu := CPUNew()
+  cpu.SetInstructions(instructions)
+  cpu.MovePCToResetVector()
+
+  cpu.RunNextInstruction()
+  if cpu.cycles != 2 { t.Fail() }
+  if cpu.Z() { t.Fail() }
+  if cpu.N() { t.Fail() }
+  cpu.cycles = 0
+
+  cpu.RunNextInstruction()
+  if cpu.cycles != 2 { t.Fail() }
+  if cpu.Z() { t.Fail() }
+  if !cpu.N() { t.Fail() }
+  cpu.cycles = 0
+
+  cpu.RunNextInstruction()
+  if cpu.cycles != 2 { t.Fail() }
+  if !cpu.Z() { t.Fail() }
+  if cpu.N() { t.Fail() }
+  cpu.cycles = 0
+}
+
 func TestNop(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     0xEA,
@@ -176,9 +220,34 @@ func TestSta(t *testing.T) {
   if cpu.cycles != 3 { t.Fail() }
   if cpu.P() != previousP { t.Fail() }
   if cpu.memory.GetUint8At(0x24) != 42 { t.Fail() }
+  if cpu.A() != 42 { t.Fail() }
   cpu.cycles = 0
 }
 
 func TestStx(t *testing.T) {
+  instructions := ConvertSimpleInstructions([]byte{
+    // Zero Page
+    // Set-up
+    0xA2, 42,   // LDX #42 ; Load 42 onto register x
+    0x86, 0x24, // STX $0  ; Store content of register X at zero page address $0
+  })
+  cpu := CPUNew()
+  cpu.SetInstructions(instructions)
+  cpu.MovePCToResetVector()
 
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  cpu.RunNextInstruction()
+  if cpu.cycles != 3 {
+    log.Printf("Expecting CPU cycles to be 3, but got %d", cpu.cycles)
+    t.Fail()
+  }
+  if cpu.memory.GetUint8At(0x24) != 42 {
+    log.Printf(
+      "Expecting value at location 0x24 to be 42, but got %d",
+      cpu.memory.GetUint8At(0x24),
+    )
+    t.Fail()
+  }
+  if cpu.X() != 42 { t.Fail() }
+  cpu.cycles = 0
 }

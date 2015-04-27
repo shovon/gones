@@ -3,7 +3,7 @@ package main
 import "errors"
 
 const (
-  // The masks that represents the flags
+  // The masks that represent the flags
   C byte = 1 << iota
   Z
   I
@@ -24,8 +24,8 @@ type CPU struct {
 }
 
 // Initializes a new CPU.
-func CPUNew() CPU {
-  return CPU{
+func CPUNew() *CPU {
+  return &CPU{
     // TODO: check to see whether or not the initial values are correct.
     pc: 0,
     sp: 0xFF,
@@ -61,6 +61,9 @@ func (c* CPU) setStatus(flag byte, status bool) {
 
 // Gets the current content of the A register.
 func (c* CPU) A() byte { return c.a }
+
+// Gets the curretn content of the X register.
+func (c* CPU) X() byte { return c.x }
 
 // Gets the current content of the P register.
 func (c* CPU) P() byte { return c.p }
@@ -108,6 +111,8 @@ func (c* CPU) N() bool { return c.status(N) }
 func (c* CPU) SetN(status bool) { c.setStatus(N, status) }
 
 // Gets the 8-bit value located where the program counter is pointing to.
+//
+// Adds a CPU cycle, and advances the program counter by one.
 func (c* CPU) getFromImmediate() byte {
   c.cycles++
   value := c.memory.GetUint8At(c.pc)
@@ -116,17 +121,23 @@ func (c* CPU) getFromImmediate() byte {
 }
 
 // Gets the zero page address.
+// 
+// Adds two CPU cycles, and advances the program counter by one.
 func (c* CPU) getZeroPageAddress() uint16 {
   c.cycles++
   return uint16(c.getFromImmediate())
 }
 
 // Gets the 8-bit value located at the zero page address.
+//
+// Adds two CPU cycles, and advances the program counter by one.
 func (c* CPU) getFromZeroPage() byte {
   return c.memory.GetUint8At(c.getZeroPageAddress());
 }
 
-// Gets the zero page,X address.
+// Gets the Zero Page,X address.
+//
+// Adds three CPU cycles, and advances the program counter by one.
 func (c* CPU) getZeroPageXAddress() uint16 {
   c.cycles += 2;
   return uint16(c.getFromImmediate() + c.x)
@@ -138,6 +149,8 @@ func (c* CPU) getFromZeroPageX() byte {
 }
 
 // Gets the absolute address.
+//
+// Adds 
 func (c* CPU) getAbsoluteAddress() uint16 {
   lsb := c.getFromImmediate()
   msb := c.getFromImmediate()
@@ -212,6 +225,10 @@ func (c* CPU) getFromIndexedIndirect() byte {
   return c.memory.GetUint8At(c.getIndexedIndirectAddress())
 }
 
+func isNegative(value byte) bool {
+  return value & 0x80 != 0
+}
+
 // ADd with Carry
 func (c* CPU) adc(value byte) {
   var carry byte = 0; if (c.C()) { carry = 1 }
@@ -220,31 +237,38 @@ func (c* CPU) adc(value byte) {
 
 // LoaD Accumulator
 func (c* CPU) lda(value byte) {
-  if value == 0 {
-    c.SetZ(true)
-  } else {
-    c.SetZ(false)
-  }
-  if value & 0x80 != 0 {
-    c.SetN(true)
-  } else {
-    c.SetN(false)
-  }
+  c.SetZ(value == 0)
+  c.SetN(isNegative(value))
   c.a = value
 }
 
+// LoaD X register
+func (c* CPU) ldx(value byte) {
+  c.SetZ(value == 0)
+  c.SetN(isNegative(value))
+}
+
+// NO oPertaion
 func (c *CPU) nop() {
   c.cycles++
 }
 
+// STore Accumulator
 func (c* CPU) sta(address uint16) {
   c.memory.SetUint8At(address, c.a)
+}
+
+// STore X register
+func (c* CPU) stx(address uint16) {
+  c.memory.SetUint8At(address, c.x)
 }
 
 // Simply runs the next instruction. Will write to registers and memory.
 func (c* CPU) RunNextInstruction() error {
   switch c.getFromImmediate() {
+
   default: return errors.New("Opcode not supported")
+
   // ADC (ADd with Carry)
   case 0x69: c.adc(c.getFromImmediate())
   case 0x65: c.adc(c.getFromZeroPage())
@@ -265,6 +289,10 @@ func (c* CPU) RunNextInstruction() error {
   case 0xA1: c.lda(c.getFromIndirectIndexed())
   case 0xB1: c.lda(c.getFromIndexedIndirect())
 
+  // LDX (LoaD X Register)
+  case 0xA2: c.ldx(c.getFromImmediate())
+
+  // NOP (NO oPeration)
   case 0xEA: c.nop()
 
   // STA (STore Accumulator)
@@ -276,12 +304,14 @@ func (c* CPU) RunNextInstruction() error {
   case 0x81: c.sta(c.getIndexedIndirectAddress())
   case 0x90: c.sta(c.getIndirectIndexedAddress(false))
 
-  // case 0x86: c.sta()
+  case 0x86: c.stx(c.getZeroPageAddress())
   }
 
   return nil
 }
 
+// Have the program counter point to the location represented by the 16-bit LE
+// values located at addresses 0xFFFC
 func (c* CPU) MovePCToResetVector() {
   c.pc = c.memory.GetUint16LEAt(0xFFFC)
 }
