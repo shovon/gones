@@ -246,6 +246,7 @@ func (c* CPU) lda(value byte) {
 func (c* CPU) ldx(value byte) {
   c.SetZ(value == 0)
   c.SetN(isNegative(value))
+  c.x = value
 }
 
 // NO oPertaion
@@ -304,6 +305,7 @@ func (c* CPU) RunNextInstruction() error {
   case 0x81: c.sta(c.getIndexedIndirectAddress())
   case 0x90: c.sta(c.getIndirectIndexedAddress(false))
 
+  // STX (STore X register)
   case 0x86: c.stx(c.getZeroPageAddress())
   }
 

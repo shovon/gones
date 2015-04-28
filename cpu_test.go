@@ -170,20 +170,30 @@ func TestLdx(t *testing.T) {
   cpu.SetInstructions(instructions)
   cpu.MovePCToResetVector()
 
+  var oldA byte
+
+  oldA = cpu.A()
+
   cpu.RunNextInstruction()
   if cpu.cycles != 2 { t.Fail() }
+  if cpu.A() != oldA { t.Fail() }
+  if cpu.X() != 3 { t.Fail() }
   if cpu.Z() { t.Fail() }
   if cpu.N() { t.Fail() }
   cpu.cycles = 0
 
   cpu.RunNextInstruction()
   if cpu.cycles != 2 { t.Fail() }
+  if cpu.A() != oldA { t.Fail() }
+  if cpu.X() != 128 { t.Fail() }
   if cpu.Z() { t.Fail() }
   if !cpu.N() { t.Fail() }
   cpu.cycles = 0
 
   cpu.RunNextInstruction()
   if cpu.cycles != 2 { t.Fail() }
+  if cpu.A() != oldA { t.Fail() }
+  if cpu.X() != 0 { t.Fail() }
   if !cpu.Z() { t.Fail() }
   if cpu.N() { t.Fail() }
   cpu.cycles = 0
@@ -236,6 +246,10 @@ func TestStx(t *testing.T) {
   cpu.MovePCToResetVector()
 
   cpu.RunNextInstruction(); cpu.cycles = 0
+  if cpu.X() != 42 {
+    log.Printf("Expecting X register to be 42, but was actually %d", cpu.X())
+    t.Fail()
+  }
   cpu.RunNextInstruction()
   if cpu.cycles != 3 {
     log.Printf("Expecting CPU cycles to be 3, but got %d", cpu.cycles)
