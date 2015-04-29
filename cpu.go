@@ -147,7 +147,20 @@ func (c* CPU) getZeroPageXAddress() uint16 {
 
 // Gets the 8-bit value located at the zero-page + x address.
 func (c* CPU) getFromZeroPageX() byte {
-  return c.memory.GetUint8At(c.getZeroPageXAddress());
+  return c.memory.GetUint8At(c.getZeroPageXAddress())
+}
+
+// Gets the Zero Page,Y address.
+//
+// Adds four CPU cycles, and advances the program counter by one.
+func (c* CPU) getZeroPageYAddress() uint16 {
+  c.cycles += 3;
+  return uint16(c.getFromImmediate() + c.y)
+}
+
+// Gets the 8-but value located at the zero-age + y address.
+func (c* CPU) getFromZereoPageY() byte {
+  return c.memory.GetUint8At(c.getZeroPageYAddress())
 }
 
 // Gets the absolute address.
@@ -273,39 +286,111 @@ func (c* CPU) RunNextInstruction() error {
   default: return errors.New("Opcode not supported")
 
   // ADC (ADd with Carry)
+  // TODO: test this
   case 0x69: c.adc(c.getFromImmediate())
+  // TODO: test this
   case 0x65: c.adc(c.getFromZeroPage())
+  // TODO: test this
   case 0x75: c.adc(c.getFromZeroPageX())
+  // TODO: test this
   case 0x6D: c.adc(c.getFromAbsolute())
+  // TODO: test this
   case 0x7D: c.adc(c.getFromAbsoluteX())
+  // TODO: test this
   case 0x79: c.adc(c.getFromAbsoluteY())
+  // TODO: test this
   case 0x61: c.adc(c.getFromIndirectIndexed())
+  // TODO: test this
   case 0x71: c.adc(c.getFromIndexedIndirect())
+
+  // AND (Logical AND)
+  // TODO: implement AND
+
+  // ASL (Arithmetic Shift Left)
+  // TODO: implement ASL
+
+  // BCC (Branch if Carry Clear)
+  // TODO: implement BCC
+
+  // BCS (Branch if Carry Set)
+  // TODO: implement BCS
+
+  // BEQ (Branch if EQual)
+  // TODO: implement BEQ
+
+  // BIT (BIT test)
+  // TODO: implement BIT
+
+  // BMI (Branch if MInus)
+  // TODO: implement BMI
+
+  // BNE (Branch if Not Equal)
+  // TODO: impelement BNE
+
+  // BPL (Branch if positive (PLus))
+  // TODO: implement BPL
+
+  // BRK (force interrupt (BReaK))
+  // TODO: implement BRK
+
+  // BVC (Branch if oVerflow Clear)
+  // TODO: implement BVC
+
+  // BVS (Branch if oVerflow Set)
+  // TODO: implement BVS
+
+  // CLC (CLear Carry flag)
+  // TODO: implement CLC
+
+  // CLD (CLear Decimal mode)
+  // TODO: implement CLD
 
   // LDA (LoaD Accumulator)
   case 0xA9: c.lda(c.getFromImmediate())
   case 0xA5: c.lda(c.getFromZeroPage())
+  // TODO: test this
   case 0xB5: c.lda(c.getFromZeroPageX())
+  // TODO: test this
   case 0xAD: c.lda(c.getFromAbsolute())
+  // TODO: test this
   case 0xBD: c.lda(c.getFromAbsoluteX())
+  // TODO: test this
   case 0xB9: c.lda(c.getFromAbsoluteY())
+  // TODO: test this
   case 0xA1: c.lda(c.getFromIndirectIndexed())
+  // TODO: test this
   case 0xB1: c.lda(c.getFromIndexedIndirect())
 
   // LDX (LoaD X Register)
   case 0xA2: c.ldx(c.getFromImmediate())
   case 0xA6: c.ldx(c.getFromZeroPage())
+  // TODO: test this
+  case 0xB6: c.ldx(c.getFromZeroPageY())
+  // TODO: test this
+  case 0xAE: c.ldx(c.getFromAbsolute())
+  // TODO: test this
+  case 0xBE: c.ldx(c.getFromAbsoluteY())
+
+  // LDY (LoaD Y Register)
+  // TODO: implement LDY
 
   // NOP (NO oPeration)
   case 0xEA: c.nop()
 
   // STA (STore Accumulator)
+  // TODO: test this
   case 0x85: c.sta(c.getZeroPageAddress())
+  // TODO: test this
   case 0x95: c.sta(c.getZeroPageXAddress())
+  // TODO: test this
   case 0x8D: c.sta(c.getAbsoluteAddress())
+  // TODO: test this
   case 0x9D: c.sta(c.getAbsoluteXAddress(false))
+  // TODO: test this
   case 0x99: c.sta(c.getAbsoluteYAddress(false))
+  // TODO: test this
   case 0x81: c.sta(c.getIndexedIndirectAddress())
+  // TODO: test this
   case 0x90: c.sta(c.getIndirectIndexedAddress(false))
 
   // STX (STore X register)

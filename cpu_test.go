@@ -90,7 +90,7 @@ func TestAdc(t *testing.T) {
   
 }
 
-func xTestLda(t *testing.T) {
+func TestLda(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     // Immediate
     0xA9, 3,
