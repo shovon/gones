@@ -25,8 +25,8 @@ func (m *Memory) GetUint8At(location uint16) byte {
 }
 
 // Sets the specified memory location with an 8-bit integer.
-func (m *Memory) SetUint8At(location uint16, value byte) {
-  m[location] = value
+func (m *Memory) SetUint8At(address uint16, value byte) {
+  m[address] = value
 }
 
 // Sets the memory with the instructions.

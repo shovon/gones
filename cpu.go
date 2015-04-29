@@ -132,7 +132,9 @@ func (c* CPU) getZeroPageAddress() uint16 {
 //
 // Adds two CPU cycles, and advances the program counter by one.
 func (c* CPU) getFromZeroPage() byte {
-  return c.memory.GetUint8At(c.getZeroPageAddress());
+  address := c.getZeroPageAddress()
+  value := c.memory.GetUint8At(address)
+  return value;
 }
 
 // Gets the Zero Page,X address.
@@ -249,14 +251,14 @@ func (c* CPU) ldx(value byte) {
   c.x = value
 }
 
-// NO oPertaion
+// N OPeration
 func (c *CPU) nop() {
   c.cycles++
 }
 
 // STore Accumulator
 func (c* CPU) sta(address uint16) {
-  c.memory.SetUint8At(address, c.a)
+  c.memory.SetUint8At(address, c.A())
 }
 
 // STore X register
@@ -292,6 +294,7 @@ func (c* CPU) RunNextInstruction() error {
 
   // LDX (LoaD X Register)
   case 0xA2: c.ldx(c.getFromImmediate())
+  case 0xA6: c.ldx(c.getFromZeroPage())
 
   // NOP (NO oPeration)
   case 0xEA: c.nop()

@@ -90,7 +90,7 @@ func TestAdc(t *testing.T) {
   
 }
 
-func TestLda(t *testing.T) {
+func xTestLda(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     // Immediate
     0xA9, 3,
@@ -164,7 +164,10 @@ func TestLdx(t *testing.T) {
 
     // Zero Page
     // Set-up
-    0xA9, 42,
+    0xA9, 42,   // LDA #42
+    0x85, 0x24, // STA $24
+    // Our operation under test
+    0xA6, 0x24, // LDX $24
   })
   cpu := CPUNew()
   cpu.SetInstructions(instructions)
@@ -174,6 +177,7 @@ func TestLdx(t *testing.T) {
 
   oldA = cpu.A()
 
+  // LDX #3
   cpu.RunNextInstruction()
   if cpu.cycles != 2 { t.Fail() }
   if cpu.A() != oldA { t.Fail() }
@@ -182,6 +186,7 @@ func TestLdx(t *testing.T) {
   if cpu.N() { t.Fail() }
   cpu.cycles = 0
 
+  // LDX #128
   cpu.RunNextInstruction()
   if cpu.cycles != 2 { t.Fail() }
   if cpu.A() != oldA { t.Fail() }
@@ -190,12 +195,48 @@ func TestLdx(t *testing.T) {
   if !cpu.N() { t.Fail() }
   cpu.cycles = 0
 
+  // LDX #0
   cpu.RunNextInstruction()
   if cpu.cycles != 2 { t.Fail() }
   if cpu.A() != oldA { t.Fail() }
   if cpu.X() != 0 { t.Fail() }
   if !cpu.Z() { t.Fail() }
   if cpu.N() { t.Fail() }
+  cpu.cycles = 0
+
+  if cpu.memory.GetUint8At(cpu.pc) != 0xA9 {
+    log.Printf("Expecting immediate LDA, but got a different instruction")
+    t.Fail()
+  }
+
+  // LDA #42
+  if cpu.RunNextInstruction() != nil {
+    log.Printf("An error occurred")
+    t.Fail()
+  }
+  cpu.cycles = 0; oldA = cpu.A()
+  if cpu.A() != 42 {
+    log.Printf("Expecting accumulator to have value 42 but got %d", cpu.A())
+    t.Fail()
+  }
+
+  // STA $24
+  cpu.RunNextInstruction(); cpu.cycles = 0
+
+  // LDX $24
+  cpu.RunNextInstruction();
+  if cpu.cycles != 3 {
+    log.Printf("Expecting 3 CPU cycles but got %d", cpu.cycles)
+    t.Fail()
+  }
+  if cpu.A() != oldA {
+    log.Printf("Expecting accumulator to be %d but got %d", oldA, cpu.A())
+    t.Fail()
+  }
+  if cpu.X() != 42 {
+    log.Printf("Expecting register X to be 42 but got %d", cpu.X())
+    t.Fail()
+  }
   cpu.cycles = 0
 }
 
@@ -234,7 +275,7 @@ func TestSta(t *testing.T) {
   cpu.cycles = 0
 }
 
-func TestStx(t *testing.T) {
+func xTestStx(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     // Zero Page
     // Set-up
