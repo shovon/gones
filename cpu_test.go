@@ -320,6 +320,28 @@ func TestLdy(t *testing.T) {
     t.Fail()
   }
   cpu.cycles = 0
+
+  if cpu.memory.GetUint8At(cpu.pc) != 0xA9 {
+    log.Printf("Expecting immediate LDA, but got a different instruction")
+    t.Fail()
+  }
+
+  // LDA #42
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  // STA $24
+  cpu.RunNextInstruction(); cpu.cycles = 0
+
+  // LDX $24
+  cpu.RunNextInstruction();
+  if cpu.cycles != 3 {
+    log.Printf("Expecting 3 CPU cycles but got %d", cpu.cycles)
+    t.Fail()
+  }
+  if cpu.Y() != 42 {
+    log.Printf("Expecting register X to be 42 but got %d", cpu.X())
+    t.Fail()
+  }
+  cpu.cycles = 0
 }
 
 func TestNop(t *testing.T) {
