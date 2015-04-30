@@ -62,8 +62,11 @@ func (c* CPU) setStatus(flag byte, status bool) {
 // Gets the current content of the A register.
 func (c* CPU) A() byte { return c.a }
 
-// Gets the curretn content of the X register.
+// Gets the current content of the X register.
 func (c* CPU) X() byte { return c.x }
+
+// Gets the current content of the Y register.
+func (c* CPU) Y() byte { return c.y }
 
 // Gets the current content of the P register.
 func (c* CPU) P() byte { return c.p }
@@ -264,6 +267,12 @@ func (c* CPU) ldx(value byte) {
   c.x = value
 }
 
+func (c* CPU) ldy(value byte) {
+  c.SetZ(value == 0)
+  c.SetN(isNegative(value))
+  c.y = value
+}
+
 // N OPeration
 func (c *CPU) nop() {
   c.cycles++
@@ -414,7 +423,7 @@ func (c* CPU) RunNextInstruction() error {
   case 0xBE: c.ldx(c.getFromAbsoluteY())
 
   // LDY (LoaD Y Register)
-  // TODO: implement LDY
+  case 0xA0: c.ldy(c.getFromImmediate())
 
   // LSR (Logical Shift Right)
   // TODO: implement LSR

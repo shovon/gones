@@ -240,6 +240,88 @@ func TestLdx(t *testing.T) {
   cpu.cycles = 0
 }
 
+func TestLdy(t *testing.T) {
+  instructions := ConvertSimpleInstructions([]byte{
+    // Immediate
+    0xA0, 3,
+    0xA0, 128,
+    0xA0, 0,
+
+    // Zero Page
+    // Set-up
+    0xA9, 42,   // LDA #42
+    0x85, 0x24, // STA $24
+    // Our operation under test
+    0xA4, 0x24, // LDY $24
+  })
+  cpu := CPUNew()
+  cpu.SetInstructions(instructions)
+  cpu.MovePCToResetVector()
+
+  var oldA byte
+
+  oldA = cpu.A()
+
+  // LDY #3
+  if cpu.RunNextInstruction() != nil {
+    log.Printf("An error occurred")
+    t.Fail()
+  }
+  if cpu.cycles != 2 { t.Fail() }
+  if cpu.A() != oldA { t.Fail() }
+  if cpu.Y() != 3 { t.Fail() }
+  if cpu.Z() { t.Fail() }
+  if cpu.N() { t.Fail() }
+  cpu.cycles = 0
+
+  // LDY #128
+  if cpu.RunNextInstruction() != nil {
+    log.Printf("An error occurred")
+    t.Fail()
+  }
+  if cpu.cycles != 2 {
+    log.Printf("Expecting cycles to be %d, but got %d", 2, cpu.cycles)
+    t.Fail()
+  }
+  if cpu.A() != oldA {
+    log.Printf("Expecting accumulator to be %d, but got %d", oldA, cpu.A())
+    t.Fail()
+  }
+  if cpu.Y() != 128 {
+    log.Printf("Expecting register Y to be %d, but got %d", 128, cpu.Y())
+    t.Fail()
+  }
+  if cpu.Z() { t.Fail() }
+  if !cpu.N() { t.Fail() }
+  cpu.cycles = 0
+
+  // LDY #0
+  if cpu.RunNextInstruction() != nil {
+    log.Printf("An error occurred")
+  }
+  if cpu.cycles != 2 {
+    log.Printf("Expecting CPU cycles count to be %d, but got cpu.cycles", 2, cpu.cycles)
+    t.Fail()
+  }
+  if cpu.A() != oldA {
+    log.Printf("Expecting accumulator to have value %d, but got %d", oldA, cpu.A())
+    t.Fail()
+  }
+  if cpu.Y() != 0 {
+    log.Printf("Expecting register Y to have value %d but got %d", 0, cpu.Y())
+    t.Fail()
+  }
+  if !cpu.Z() {
+    log.Printf("Expecting flag Z to be set")
+    t.Fail()
+  }
+  if cpu.N() {
+    log.Printf("Expecting flag N to be clear")
+    t.Fail()
+  }
+  cpu.cycles = 0
+}
+
 func TestNop(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
     0xEA,
