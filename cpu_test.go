@@ -86,6 +86,8 @@ func TestMovePCToResetVector(t *testing.T) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 func TestAdc(t *testing.T) {
   
 }
@@ -253,6 +255,14 @@ func TestLdy(t *testing.T) {
     0x85, 0x24, // STA $24
     // Our operation under test
     0xA4, 0x24, // LDY $24
+
+    // Zero Page,X
+    // Set-up
+    0xA9, 24,   // LDA #24
+    0xA2, 2,    // LDX #2
+    0x95, 0x42, // STA $42,X
+    // Our operation under test
+    0xB4, 0x42,
   })
   cpu := CPUNew()
   cpu.SetInstructions(instructions)
@@ -362,8 +372,14 @@ func TestNop(t *testing.T) {
 
 func TestSta(t *testing.T) {
   instructions := ConvertSimpleInstructions([]byte{
-    0xA9, 42,
-    0x85, 0x24,
+    // Zero Page
+    0xA9, 42,   // LDA #42
+    0x85, 0x24, // STA $24
+
+    // Zero Page,X
+    0xA9, 24,   // LDA #24
+    0xA2, 3,    // LDX #3
+    0x95, 0x42, // STA $42,X
   })
   cpu := CPUNew()
   cpu.SetInstructions(instructions)
@@ -376,6 +392,16 @@ func TestSta(t *testing.T) {
   if cpu.P() != previousP { t.Fail() }
   if cpu.memory.GetUint8At(0x24) != 42 { t.Fail() }
   if cpu.A() != 42 { t.Fail() }
+  cpu.cycles = 0
+
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  cpu.RunNextInstruction(); cpu.cycles = 0
+  cpu.RunNextInstruction()
+  if cpu.cycles != 4 {
+    log.Printf("Expecting CPU cycles to be %d, but got %d", 4, cpu.cycles)
+    t.Fail()
+  }
+  if cpu.memory.GetUint8At(0x42 + 3) != 24 { t.Fail() }
   cpu.cycles = 0
 }
 

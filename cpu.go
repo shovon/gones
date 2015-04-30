@@ -425,6 +425,7 @@ func (c* CPU) RunNextInstruction() error {
   // LDY (LoaD Y Register)
   case 0xA0: c.ldy(c.getFromImmediate())
   case 0xA4: c.ldy(c.getFromZeroPage())
+  case 0xB4: c.ldy(c.getFromZeroPageX())
 
   // LSR (Logical Shift Right)
   // TODO: implement LSR
