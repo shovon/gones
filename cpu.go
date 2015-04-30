@@ -159,7 +159,7 @@ func (c* CPU) getZeroPageYAddress() uint16 {
 }
 
 // Gets the 8-but value located at the zero-age + y address.
-func (c* CPU) getFromZereoPageY() byte {
+func (c* CPU) getFromZeroPageY() byte {
   return c.memory.GetUint8At(c.getZeroPageYAddress())
 }
 
@@ -345,6 +345,48 @@ func (c* CPU) RunNextInstruction() error {
   // CLD (CLear Decimal mode)
   // TODO: implement CLD
 
+  // CLI (CLear Interrupt Disable)
+  // TODO: implement CLI
+
+  // CLV (CLear oVerflow flag)
+  // TODO: implement CLV
+
+  // CMP (CoMPare)
+  // TODO: implement CMP
+
+  // CPX (ComPare X)
+  // TODO: implement CPX
+
+  // CPY (ComPare Y)
+  // TODO: implement CPY
+
+  // DEC (DECrement memory)
+  // TODO: implement DEC
+
+  // DEX (DEcrement X register)
+  // TODO: implement DEX
+
+  // DEY (DEcrement Y register)
+  // TODO: implement DEY
+
+  // EOR (Exclosive OR)
+  // TODO: implement EOR
+
+  // INC (INCrement memory)
+  // TODO: implement INC
+
+  // INX (INcrement X register)
+  // TODO: implement INX
+
+  // INY (INcrement Y register)
+  // TODO: implement INY
+
+  // JMP (JuMP)
+  // TODO: implement JMP
+
+  // JSR (Jump to SubRoutine)
+  // TODO: implement JSR
+
   // LDA (LoaD Accumulator)
   case 0xA9: c.lda(c.getFromImmediate())
   case 0xA5: c.lda(c.getFromZeroPage())
@@ -374,8 +416,50 @@ func (c* CPU) RunNextInstruction() error {
   // LDY (LoaD Y Register)
   // TODO: implement LDY
 
+  // LSR (Logical Shift Right)
+  // TODO: implement LSR
+
   // NOP (NO oPeration)
   case 0xEA: c.nop()
+
+  // ORA (logical inclusive OR with A)
+  // TODO: implement ORA
+
+  // PHA (PusH Accumulator)
+  // TODO: implement PHA
+
+  // PHP (PusH Processor status)
+  // TODO: implement PHP
+
+  // PLA (PuLl Accumulator)
+  // TODO: implement PLA
+
+  // PLP (PuLl Processor status)
+  // TODO: implement PLP
+
+  // ROL (ROtate Left)
+  // TODO: implement ROL
+
+  // ROR (ROtate Right)
+  // TODO: implement ROR
+
+  // RTI (ReTurn from Interrupt)
+  // TODO: implement RTI
+
+  // RTS (ReTurn from Subroutine)
+  // TODO: implement RTS
+
+  // SBC (SuBtract with Carry)
+  // TODO: implement SBC
+
+  // SEC (SEt Carry)
+  // TODO: implement SEC
+
+  // SED (SEt Decimal flag)
+  // TODO: implement SED
+
+  // SEI (SEt Interrupt disable)
+  // TODO: implement SEI
 
   // STA (STore Accumulator)
   // TODO: test this
@@ -395,6 +479,29 @@ func (c* CPU) RunNextInstruction() error {
 
   // STX (STore X register)
   case 0x86: c.stx(c.getZeroPageAddress())
+  // TODO: implement Zero Page,Y
+  // TODO: implement Absolute
+
+  // STY (STore Y register)
+  // TODO: implement STY
+
+  // TAX (Transfer Accumulator to X register)
+  // TODO: implement TAX
+
+  // TAY (Transfer Accumulator to Y register)
+  // TODO: implement TAY
+
+  // TSX (Transfer Stack Pointer to X)
+  // TODO: implement TSX
+
+  // TXA (Transfer register X to Accumulator)
+  // TODO: implement TXA
+
+  // TXS (Transfer X register to Stack pointer)
+  // TODO: implement TXS
+
+  // TYA (Transfer Y register to Accumulator)
+  // TODO: implement TYA
   }
 
   return nil
